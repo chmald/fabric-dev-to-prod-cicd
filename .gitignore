@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.vscode/
+.fabric_local/
+
+.sp-secret.json
+
+# Per-tenant snapshot of real workspace + Fabric item IDs. Use demo-ids.template.json as a starting point.
+demo-ids.json

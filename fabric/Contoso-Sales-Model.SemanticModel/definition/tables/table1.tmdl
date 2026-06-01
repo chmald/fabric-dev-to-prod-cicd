@@ -1,0 +1,21 @@
+table table1
+	lineageTag: c2045617-10da-4a3c-bcd0-4a993c0d57d1
+	sourceLineageTag: [dbo].[table1]
+
+	column col1
+		dataType: int64
+		formatString: 0
+		lineageTag: 5bb2c31e-4c02-4344-beca-a76112ad8952
+		sourceLineageTag: col1
+		summarizeBy: sum
+		sourceColumn: col1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition table1 = entity
+		mode: directLake
+		source
+			entityName: table1
+			schemaName: dbo
+			expressionSource: 'DirectLake - Contoso-Sales-WH'
+

@@ -1,0 +1,30 @@
+{
+  "tenantId": "00000000-0000-0000-0000-000000000000",
+  "subscriptionId": "00000000-0000-0000-0000-000000000000",
+  "adoOrg": "<your-ado-org>",
+  "adoProject": "fabric-cicd-ado-integration",
+  "adoRepo": "fabric-cicd-ado-integration",
+  "adoRemote": "https://dev.azure.com/<your-ado-org>/fabric-cicd-ado-integration/_git/fabric-cicd-ado-integration",
+  "capacityId": "00000000-0000-0000-0000-000000000000",
+  "capacityName": "<your-capacity-name>",
+  "capacitySku": "F2",
+  "workspaces": {
+    "dev": {
+      "name": "Contoso-Sales-Dev",
+      "id": "00000000-0000-0000-0000-000000000000",
+      "branch": "dev",
+      "lakehouseId": "00000000-0000-0000-0000-000000000000",
+      "warehouseId": "00000000-0000-0000-0000-000000000000",
+      "warehouseSqlEndpoint": "<dev-warehouse-sql>.datawarehouse.fabric.microsoft.com"
+    },
+    "prod": {
+      "name": "Contoso-Sales-Prod",
+      "id": "00000000-0000-0000-0000-000000000000",
+      "branch": "prod",
+      "lakehouseId": "00000000-0000-0000-0000-000000000000",
+      "warehouseId": "00000000-0000-0000-0000-000000000000",
+      "warehouseSqlEndpoint": "<prod-warehouse-sql>.datawarehouse.fabric.microsoft.com"
+    }
+  },
+  "_note": "Template snapshot. Copy to demo-ids.json (gitignored) and fill in your real values. The pipeline does NOT read this file at runtime — per-env values are supplied by ADO variable groups contoso-fabric-env-dev / contoso-fabric-env-prod. This file is for human reference + local dry-runs of scripts/inject_env_values.py."
+}

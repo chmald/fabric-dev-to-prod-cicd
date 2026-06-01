@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "Contoso_Sales_LH",
+    "description": "Bronze + silver Delta tables for Contoso Sales demo."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9214fc40-2b44-4da4-b326-de2d2f8cae79"
+  }
+}

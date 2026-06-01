@@ -1,0 +1,27 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/valueSet/1.0.0/schema.json",
+  "name": "Prod",
+  "description": "Value set for the Contoso-Sales-Prod workspace (bound to git branch `prod`). PLACEHOLDER values — populate after Prod workspace is created/renamed and IDs are looked up via Fabric portal or REST API. See HANDOFF.md § Prod workspace provisioning.",
+  "variableOverrides": [
+    {
+      "name": "environmentLabel",
+      "value": "Prod"
+    },
+    {
+      "name": "workspaceId",
+      "value": "22222222-2222-2222-2222-222222222222"
+    },
+    {
+      "name": "lakehouseId",
+      "value": "44444444-4444-4444-4444-444444444444"
+    },
+    {
+      "name": "warehouseId",
+      "value": "66666666-6666-6666-6666-666666666666"
+    },
+    {
+      "name": "warehouseSqlEndpoint",
+      "value": "<prod-warehouse-sql>.datawarehouse.fabric.microsoft.com"
+    }
+  ]
+}

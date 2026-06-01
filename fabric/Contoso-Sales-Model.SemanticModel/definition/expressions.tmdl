@@ -1,0 +1,40 @@
+/// =============================================================================
+/// expressions.tmdl  —  Contoso-Sales-Model SemanticModel  (Direct Lake on OneLake)
+///
+/// IMPORTANT — this file is SCAFFOLDING.
+///
+/// `WorkspaceId` and `LakehouseId` are M parameters whose values are OVERWRITTEN
+/// per workspace by the ADO pipeline's Stage 3 (InjectEnvValues) using values
+/// from the matching ADO variable group:
+///
+///     dev  branch / Dev workspace  → values from `contoso-fabric-env-dev`
+///     prod branch / Prod workspace → values from `contoso-fabric-env-prod`
+///
+/// Whatever values are committed here matter only at the moment Fabric finishes
+/// `updateFromGit` and before Stage 3 runs (a few seconds). The injection step
+/// then puts the real per-environment IDs in place via Fabric REST
+/// `updateDefinition`. Keeping the dev defaults here means the Dev workspace
+/// works end-to-end even if someone runs `updateFromGit` outside the pipeline.
+///
+/// To CHANGE the per-environment values, edit the ADO variable group — not
+/// this file. See docs/06-dynamic-env-injection.md.
+///
+/// Pattern: M parameters for Direct Lake on OneLake — the pipeline
+/// rewrites these values per workspace so promotion doesn't require
+/// manual parameter changes. See docs/01-direct-lake-variables.md.
+/// =============================================================================
+expression WorkspaceId = "11111111-1111-1111-1111-111111111111" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+expression LakehouseId = "33333333-3333-3333-3333-333333333333" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+expression WarehouseId = "55555555-5555-5555-5555-555555555555" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+expression 'DirectLake - Contoso-Sales-WH' =
+		let
+		    Source = AzureStorage.DataLake("https://onelake.dfs.fabric.microsoft.com/" & #"WorkspaceId" & "/" & #"WarehouseId", [HierarchicalNavigation=true])
+		in
+		    Source
+	lineageTag: 0226b033-d513-42a3-9b8d-fbe2af67dc06
+
+	annotation PBI_IncludeFutureArtifacts = False
+

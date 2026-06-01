@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Contoso-Sales-Model",
+    "description": "Direct Lake on OneLake semantic model. WorkspaceId + LakehouseId parameters resolve to the active environment's Dev or Prod values per branch (dev → Dev workspace IDs, prod → Prod workspace IDs)."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "d1c5b3e6-ae0c-94b2-4b64-1270527f21d4"
+  }
+}

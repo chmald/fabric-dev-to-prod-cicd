@@ -1,0 +1,273 @@
+# =============================================================================
+# Workspace-per-branch CI/CD for Microsoft Fabric, driven by Azure DevOps + the
+# Fabric REST API for Git integration (no Fabric Deployment Pipelines).
+#
+# Branch ↔ workspace binding (set once in the Fabric portal per workspace):
+#   dev  branch  ↔ Contoso-Sales-Dev   workspace
+#   prod branch  ↔ Contoso-Sales-Prod  workspace
+#
+# Three stages on every qualifying push:
+#
+#   1. Validate           — scripts/validate_fabric_items.py
+#        Schema / TMDL / Variable-Library structural checks; no Fabric calls.
+#
+#   2. SyncFabricFromBranch — POST /workspaces/{wsId}/git/updateFromGit
+#        Tells Fabric "your branch advanced; please pull." The pipeline owns
+#        the LRO poll so the workspace is observably synced before the next
+#        stage starts.
+#
+#   3. InjectEnvValues    — scripts/inject_env_values.py
+#        Pulls per-environment identifiers from an ADO variable group
+#        (contoso-fabric-env-dev | contoso-fabric-env-prod) and writes them into the
+#        synced workspace via Fabric REST `updateDefinition`:
+#            * Contoso_Vars VariableLibrary   → valueSets/<Dev|Prod>.json overrides
+#            * Contoso-Sales-Model SemanticModel → expressions.tmdl M parameter values
+#        Idempotent — skipped per-item if the decoded definition already matches.
+#        Solves the Direct Lake parameter-swap limitation (DP rules are
+#        greyed out for Direct Lake on OneLake models). See docs/01.
+#
+# Active value-set selection in the Variable Library is a one-time per-workspace
+# manual step in the Fabric portal (no public REST endpoint today). See
+# docs/06-dynamic-env-injection.md for setup.
+# =============================================================================
+
+name: 'fabric-cicd-$(Date:yyyyMMdd)$(Rev:.r)'
+
+trigger:
+  branches:
+    include:
+      - dev
+      - prod
+  paths:
+    include:
+      - fabric/*
+      - scripts/*
+      - .azuredevops/pipelines/*
+
+pr:
+  branches:
+    include:
+      - dev
+      - prod
+  paths:
+    include:
+      - fabric/*
+      - scripts/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - name: pythonVersion
+    value: '3.11'
+  - name: serviceConnection
+    value: 'fabric-cicd-sp'
+
+stages:
+# -----------------------------------------------------------------------------
+# STAGE 1 — VALIDATE (runs on every PR, runs on every push)
+# Catches structural problems before Fabric ever sees the commit. No Fabric
+# API calls; purely local file checks.
+# -----------------------------------------------------------------------------
+- stage: Validate
+  displayName: 'Validate Fabric items'
+  jobs:
+  - job: validate
+    displayName: 'Schema + TMDL + Variable Library checks'
+    steps:
+    - checkout: self
+      fetchDepth: 2
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+      displayName: 'Use Python $(pythonVersion)'
+
+    - script: python scripts/validate_fabric_items.py
+      displayName: 'Validate Fabric items'
+
+    - script: |
+        if [[ "$BUILD_REASON" == "PullRequest" ]]; then
+          BASE=$(git merge-base HEAD origin/$SYSTEM_PULLREQUEST_TARGETBRANCHNAME)
+        else
+          BASE=$(git rev-parse HEAD~1 2>/dev/null || git hash-object -t tree /dev/null)
+        fi
+        echo "Diff base: $BASE"
+        git diff --name-only $BASE HEAD -- 'fabric/' | awk -F/ 'NF>=2 {print $1"/"$2}' | sort -u | tee changed_items.txt
+        echo "Changed Fabric items: $(wc -l < changed_items.txt)"
+      displayName: 'Detect changed Fabric items'
+
+# -----------------------------------------------------------------------------
+# STAGE 2 — SYNC TO FABRIC (only on direct push to dev or prod, not on PRs)
+# Triggers Fabric to pull the branch into its bound workspace. The git
+# integration normally auto-syncs on a background interval; explicitly calling
+# updateFromGit + polling the LRO makes the sync observable in the pipeline
+# log and bounds the workspace state at this commit before the inject stage.
+# -----------------------------------------------------------------------------
+- stage: SyncFabricFromBranch
+  displayName: 'Sync Fabric workspace from branch'
+  dependsOn: Validate
+  condition: and(succeeded(), in(variables['Build.SourceBranch'], 'refs/heads/dev', 'refs/heads/prod'))
+  variables:
+    # Static variable group selection (rubber-duck #1 — avoid runtime expressions
+    # in `- group:` because authorization is resolved at compile time).
+    - ${{ if eq(variables['Build.SourceBranchName'], 'dev') }}:
+      - group: contoso-fabric-env-dev
+    - ${{ if eq(variables['Build.SourceBranchName'], 'prod') }}:
+      - group: contoso-fabric-env-prod
+  jobs:
+  - deployment: sync_workspace
+    displayName: 'updateFromGit → poll → workspace $(WORKSPACE_ID)'
+    environment: 'fabric-$(Build.SourceBranchName)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          # Idempotently bind the SP's per-workspace `myGitCredentials` to the
+          # Fabric Azure DevOps source-control Connection. Without this, the
+          # very first `updateFromGit` call from a brand-new SP/workspace pair
+          # returns `GitCredentialsNotConfigured`. Re-running with the same
+          # connectionId is a no-op on Fabric's side, so it's safe on every run.
+          # Gated on `GIT_CONNECTION_ID` so environments that haven't published
+          # a connection yet just skip the bind. See
+          # docs/07-service-principal-fabric-git-setup.md for one-time setup.
+          - task: AzureCLI@2
+            displayName: 'Ensure myGitCredentials bound to Fabric ADO connection'
+            condition: and(succeeded(), ne(variables['GIT_CONNECTION_ID'], ''))
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                $token   = az account get-access-token --resource https://api.fabric.microsoft.com --query accessToken -o tsv
+                $headers = @{ Authorization = "Bearer $token"; 'Content-Type' = 'application/json' }
+                $body    = @{ source = "ConfiguredConnection"; connectionId = "$(GIT_CONNECTION_ID)" } | ConvertTo-Json
+
+                Invoke-RestMethod -Method PATCH `
+                    -Uri "https://api.fabric.microsoft.com/v1/workspaces/$(WORKSPACE_ID)/git/myGitCredentials" `
+                    -Headers $headers -Body $body | Out-Null
+                Write-Host "✓ myGitCredentials bound to connection $(GIT_CONNECTION_ID)"
+
+          - task: AzureCLI@2
+            displayName: 'Fabric updateFromGit + poll'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                $targetWsId = "$(WORKSPACE_ID)"
+                $branch     = "$(Build.SourceBranchName)"
+                Write-Host "Branch [$branch] → Workspace [$targetWsId]"
+
+                $token = (az account get-access-token --resource https://api.fabric.microsoft.com --query accessToken -o tsv)
+                $headers = @{
+                    'Authorization' = "Bearer $token"
+                    'Content-Type'  = 'application/json'
+                }
+
+                $status = Invoke-RestMethod -Method GET `
+                    -Uri "https://api.fabric.microsoft.com/v1/workspaces/$targetWsId/git/status" `
+                    -Headers $headers -TimeoutSec 60
+                Write-Host "workspaceHead   : $($status.workspaceHead)"
+                Write-Host "remoteCommitHash: $($status.remoteCommitHash)"
+                Write-Host "Pending changes : $($status.changes.Count)"
+
+                if ($status.workspaceHead -eq $status.remoteCommitHash -and $status.changes.Count -eq 0) {
+                    Write-Host "✓ Already in sync — nothing to do."
+                    exit 0
+                }
+
+                $body = @{
+                    remoteCommitHash = $status.remoteCommitHash
+                    workspaceHead    = $status.workspaceHead
+                    conflictResolution = @{
+                        conflictResolutionType   = "Workspace"
+                        conflictResolutionPolicy = "PreferRemote"   # branch is truth
+                    }
+                    options = @{ allowOverrideItems = $true }
+                } | ConvertTo-Json -Depth 5
+
+                $resp = Invoke-WebRequest -Method POST `
+                    -Uri "https://api.fabric.microsoft.com/v1/workspaces/$targetWsId/git/updateFromGit" `
+                    -Headers $headers -Body $body -UseBasicParsing -TimeoutSec 60
+                $opId = $resp.Headers['x-ms-operation-id']
+                Write-Host "Operation: $opId"
+
+                do {
+                    Start-Sleep -Seconds 8
+                    $op = Invoke-RestMethod -Method GET `
+                        -Uri "https://api.fabric.microsoft.com/v1/operations/$opId" `
+                        -Headers $headers -TimeoutSec 20
+                    Write-Host "  status=$($op.status)"
+                } while ($op.status -in @('NotStarted','Running'))
+
+                if ($op.status -ne 'Succeeded') {
+                    Write-Error "updateFromGit failed: $($op | ConvertTo-Json -Depth 6)"
+                    exit 1
+                }
+                Write-Host "✓ Workspace $targetWsId synchronized to commit $($status.remoteCommitHash)"
+
+# -----------------------------------------------------------------------------
+# STAGE 3 — INJECT ENVIRONMENT VALUES (post-sync write-back)
+# Reads the per-environment identifiers from the matching ADO variable group
+# and writes them into the just-synced workspace via Fabric REST
+# `getDefinition` + `updateDefinition`:
+#
+#   * Variable Library  — overwrites valueSets/<Dev|Prod>.json overrides
+#   * Semantic Model    — overwrites WorkspaceId + LakehouseId M params
+#
+# Idempotent: if the workspace's current decoded definition already matches the
+# ADO-supplied values, no `updateDefinition` call is made. Post-update fetch
+# verifies the SemanticModel M params actually round-trip.
+# -----------------------------------------------------------------------------
+- stage: InjectEnvValues
+  displayName: 'Inject env values (Fabric REST)'
+  dependsOn: SyncFabricFromBranch
+  condition: and(succeeded(), in(variables['Build.SourceBranch'], 'refs/heads/dev', 'refs/heads/prod'))
+  variables:
+    - ${{ if eq(variables['Build.SourceBranchName'], 'dev') }}:
+      - group: contoso-fabric-env-dev
+    - ${{ if eq(variables['Build.SourceBranchName'], 'prod') }}:
+      - group: contoso-fabric-env-prod
+  jobs:
+  - deployment: inject_values
+    displayName: 'Inject Variable Library + SemanticModel values'
+    environment: 'fabric-$(Build.SourceBranchName)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+            fetchDepth: 1
+
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+            displayName: 'Use Python $(pythonVersion)'
+
+          - script: pip install --quiet -r scripts/requirements.txt
+            displayName: 'pip install'
+
+          - task: AzureCLI@2
+            displayName: 'Acquire Fabric token + run injector'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              # Pass the Fabric token explicitly (rubber-duck #3 — don't rely on
+              # DefaultAzureCredential across task boundaries).
+              inlineScript: |
+                set -euo pipefail
+                FABRIC_TOKEN=$(az account get-access-token \
+                    --resource https://api.fabric.microsoft.com \
+                    --query accessToken -o tsv)
+                export FABRIC_TOKEN
+                python scripts/inject_env_values.py
+            env:
+              FABRIC_WORKSPACE_ID:  $(WORKSPACE_ID)
+              INJECT_VALUE_SET:     $(VALUE_SET)
+              INJECT_ENV_LABEL:     $(ENVIRONMENT_LABEL)
+              INJECT_WORKSPACE_ID:  $(WORKSPACE_ID)
+              INJECT_LAKEHOUSE_ID:  $(LAKEHOUSE_ID)
+              INJECT_WAREHOUSE_ID:  $(WAREHOUSE_ID)
+              INJECT_WAREHOUSE_SQL: $(WAREHOUSE_SQL_ENDPOINT)
