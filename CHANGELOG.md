@@ -22,7 +22,7 @@ Retrofit to the current demo-pattern standard (docs/-first layout, draw.io diagr
 
 - `validate_fabric_items.py` reads `SEMANTIC_MODEL_NAME` (as the injector does) and checks all three M parameters Stage 3 rewrites (`WorkspaceId`, `LakehouseId`, `WarehouseId`); previously `WarehouseId` was unchecked, so a missing line failed only in Stage 3.
 - Both scripts force UTF-8 console output so local runs on Windows don't crash on the status glyphs.
-- Pipeline `serviceConnection` default is now the generic `fabric-cicd-sp` - **set it to your service connection name before running**.
+- Pipeline `serviceConnection` default is now the generic `fabric-cicd-sp` - **set it to your service connection name before running**. [11 § 1](./docs/11-service-principal-fabric-git-setup.md#1-entra-app-registration), [03](./docs/03-deployment.md) and [00](./docs/00-reproduce-this-demo.md) spell out the setup step: create an Azure Resource Manager (workload identity federation) service connection named `fabric-cicd-sp`, or change `serviceConnection` in each pipeline YAML to your own name.
 - New tests: `test_reusability_guards.py`, `test_configuration.py`, `test_scripts_offline.py`, `test_doc_visuals.py`. All test files run with or without `pytest`.
 - `demo-ids.template.json` gains `_template`, a `workload` config block (the only domain-specific surface) and `optionalPaths`; `.gitignore` covers `demo-ids.local.json`, `*.local.json`, `.env*`, keys and `.leak-patterns.txt`.
 - Org- and person-specific names (tenant label, subscription name, ADO organisation, service connection) removed from docs and YAML.

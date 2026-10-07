@@ -57,6 +57,7 @@ Run the validator locally - it prints the same errors as the agent: `python scri
 | Is the workspace bound to the right branch? | Workspace settings -> Git integration |
 | Is the tenant setting scoped to the SP's group? | Fabric Admin portal -> Developer settings |
 
+<a id="stage-3---inject"></a>
 ## <img src="./assets/icons/variable-library.svg" width="24" alt=""/> Stage 3 - Inject
 
 Run a dry run locally against the same workspace (reads everything, writes nothing):
@@ -80,6 +81,7 @@ python scripts/inject_env_values.py
 
 A variable you added to the group but not to the injector's `overrides` map is silently ignored - see [09 - Add a variable](./09-semantic-model-deploy.md#add-a-variable-to-the-variable-library).
 
+<a id="variable-library-discoverdependenciesfailed"></a>
 ## <img src="./assets/icons/variable-library.svg" width="24" alt=""/> Variable library: DiscoverDependenciesFailed
 
 > [!WARNING]

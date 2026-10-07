@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/valueSet/1.0.0/schema.json",
   "name": "Prod",
-  "description": "Value set for the Contoso-Sales-Prod workspace (bound to git branch `prod`). PLACEHOLDER values — populate after Prod workspace is created/renamed and IDs are looked up via Fabric portal or REST API. See HANDOFF.md § Prod workspace provisioning.",
+  "description": "Value set for the Contoso-Sales-Prod workspace (bound to git branch `prod`). Placeholder IDs in Git; the pipeline injects the real Prod values from the contoso-fabric-env-prod variable group (see docs/10-dynamic-env-injection.md).",
   "variableOverrides": [
     {
       "name": "environmentLabel",

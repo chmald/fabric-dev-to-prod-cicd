@@ -60,7 +60,7 @@ Follow [11 - Service principal + Fabric Git setup](./11-service-principal-fabric
 
 | Step | | Action |
 |---|---|---|
-| **1.1** | <img src="./assets/icons/app-registrations.svg" width="24" alt=""/> | App registration + federated credential; ADO service connection `fabric-cicd-sp` (workload identity federation) |
+| **1.1** | <img src="./assets/icons/app-registrations.svg" width="24" alt=""/> | App registration + federated credential; ADO service connection (Azure Resource Manager, workload identity federation) named `fabric-cicd-sp` - or your own name, then set `serviceConnection` to match in Phase 3 |
 | **1.2** | <img src="./assets/icons/policy.svg" width="24" alt=""/> | Tenant settings for the SP's group; SP Admin on both workspaces; SP in the ADO org |
 | **1.3** | <img src="./assets/icons/git-branch-sync.svg" width="24" alt=""/> | Fabric ADO source-control connection (note its ID); bind `dev` / `prod` in the portal |
 
@@ -86,7 +86,7 @@ Create `contoso-fabric-env-dev` and `contoso-fabric-env-prod` in Pipelines -> Li
 
 ## Phase 3 - Register the pipeline
 
-1. Set `serviceConnection` in [`deploy-workspace-per-branch.yml`](../.azuredevops/pipelines/deploy-workspace-per-branch.yml) to your service connection name. It must be a literal: `azureSubscription` is resolved at compile time.
+1. Set `serviceConnection` in [`deploy-workspace-per-branch.yml`](../.azuredevops/pipelines/deploy-workspace-per-branch.yml) to your service connection name (shipped default `fabric-cicd-sp`; no change needed if you used that name). It must be a literal: `azureSubscription` is resolved at compile time.
 2. Pipelines -> New pipeline -> Azure Repos Git -> this repo -> **Existing Azure Pipelines YAML file** -> `/.azuredevops/pipelines/deploy-workspace-per-branch.yml` -> **Save** (don't run).
 3. Set the variable library's active value set per workspace ([10 § 5](./10-dynamic-env-injection.md#5-set-the-active-value-set-in-each-workspace)).
 

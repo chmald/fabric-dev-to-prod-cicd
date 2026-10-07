@@ -41,6 +41,9 @@ Work in order; each step depends on the one before.
 | <img src="./assets/icons/entra-workload-id.svg" width="20" alt=""/> | Credential | **Federated credential** created by the ADO service connection (workload identity federation) - recommended; a client secret works but must be rotated |
 | <img src="./assets/icons/keys.svg" width="20" alt=""/> | API permissions | None - the token audience is `https://api.fabric.microsoft.com` |
 
+> [!IMPORTANT]
+> **Create the ADO service connection for this app registration.** Project settings -> Service connections -> New -> **Azure Resource Manager** -> **Workload identity federation**, using the app registration above ([connect to Azure](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure)). The pipeline YAML expects it to be named `fabric-cicd-sp`: either use that name, or use your own and change the `serviceConnection` variable in each pipeline YAML to match ([13](./13-configuration-reference.md#pipeline-variables---shipped-path)). The value is a compile-time literal, so it can't come from a variable group.
+
 ### 2. Fabric tenant settings
 
 Fabric Admin portal -> Tenant settings; enable each and scope it to a security group containing the SP ([developer settings](https://learn.microsoft.com/en-us/fabric/admin/service-admin-portal-developer), [Git settings](https://learn.microsoft.com/en-us/fabric/admin/git-integration-admin-settings)).

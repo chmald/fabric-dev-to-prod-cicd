@@ -112,7 +112,7 @@ This is the bulk of the setup. The one-time runbook with copy-paste PowerShell i
 | **C2** | <img src="./assets/icons/users.svg" width="24" alt=""/> | Add the SP to the ADO org (Basic) and the project's Contributors | `GitCloneFailure` / 401 |
 | **C3** | <img src="./assets/icons/policy.svg" width="24" alt=""/> | Tenant settings: *Service principals can call Fabric public APIs*; *Users can synchronize workspace items with their Git repositories* | `InsufficientPrivileges` |
 | **C4** | <img src="./assets/icons/fabric-workspace.svg" width="24" alt=""/> | SP **Admin** on both workspaces | `InsufficientPrivileges` / 403 |
-| **C5** | <img src="./assets/icons/entra-workload-id.svg" width="24" alt=""/> | ADO service connection `fabric-cicd-sp` (Azure Resource Manager, workload identity federation) | auth failure in Stage 2 |
+| **C5** | <img src="./assets/icons/entra-workload-id.svg" width="24" alt=""/> | ADO service connection (Azure Resource Manager, workload identity federation) named `fabric-cicd-sp`, or your own name with `serviceConnection` changed to match in the YAML (E4) | auth failure in Stage 2 |
 | **C6** | <img src="./assets/icons/git-branch-sync.svg" width="24" alt=""/> | Fabric Azure DevOps source-control connection; SP has the User role; note its ID | `GitCredentialsNotConfigured` |
 
 > [!WARNING]
