@@ -1,4 +1,4 @@
-# Fabric CI/CD with Azure DevOps
+# Fabric Dev-to-Prod CI/CD with Azure DevOps
 
 <p align="center">
   <img src="./docs/assets/icons/fabric.svg" width="40" alt="Microsoft Fabric"/>&nbsp;
@@ -22,6 +22,7 @@
 
 A reusable demo pattern for promoting **Microsoft Fabric** items (Lakehouse, Warehouse, a Direct Lake on OneLake semantic model and a variable library) between Dev and Prod workspaces with **Azure DevOps**. Each workspace is bound to its own Git branch, one ADO YAML pipeline validates, syncs and injects per-environment values, and a `git merge dev -> prod` is the whole promotion. It is for data platform engineers, Solution Engineers and architects who need to show, then adapt, a Fabric CI/CD setup that works under a service principal and solves the Direct Lake "rules are greyed out" problem. The example workload is a generic **Contoso Sales** model; retargeting it is a configuration change.
 
+> Formerly published as `fabric-cicd-ado-integration`. Old links redirect automatically. Renumbered doc pages are mapped in [Moved documents](#moved-documents).
 ## At a glance
 
 | | Item | Value |
@@ -148,6 +149,22 @@ fabric-cicd-ado-integration/
 | <img src="./docs/assets/icons/app-registrations.svg" width="20" alt=""/> | [11 - SP + Fabric Git setup](./docs/11-service-principal-fabric-git-setup.md) | One-time identity onboarding |
 | <img src="./docs/assets/icons/users.svg" width="20" alt=""/> | [12 - Workshop walkthrough](./docs/12-workshop-walkthrough.md) | Presenting it in 60 minutes |
 | <img src="./docs/assets/icons/gear.svg" width="20" alt=""/> | [13 - Configuration reference](./docs/13-configuration-reference.md) | Changing any name, ID or behaviour |
+
+## Moved documents
+
+v2.0.0 (2026-10-07) renumbered the original docs to the standard demo layout. If you hold a link to an old path, use the new location below.
+
+| Old path (before v2.0.0) | New location |
+|---|---|
+| `docs/01-direct-lake-variables.md` | [docs/06-direct-lake-variables.md](./docs/06-direct-lake-variables.md) |
+| `docs/02-lakehouse-warehouse-promotion.md` | [docs/07-cicd-paths-and-promotion.md](./docs/07-cicd-paths-and-promotion.md) |
+| `docs/03-ado-bridge-guidance.md` | [docs/08-ado-bridge-guidance.md](./docs/08-ado-bridge-guidance.md) |
+| `docs/04-architecture-best-practices.md` | [docs/01-architecture.md](./docs/01-architecture.md) |
+| `docs/05-semantic-model-deploy.md` | [docs/09-semantic-model-deploy.md](./docs/09-semantic-model-deploy.md) |
+| `docs/06-dynamic-env-injection.md` | [docs/10-dynamic-env-injection.md](./docs/10-dynamic-env-injection.md) |
+| `docs/07-service-principal-fabric-git-setup.md` | [docs/11-service-principal-fabric-git-setup.md](./docs/11-service-principal-fabric-git-setup.md) |
+
+`docs/00-reproduce-this-demo.md` kept its path.
 
 ## Distribution and check-in
 
