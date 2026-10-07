@@ -1,0 +1,5 @@
+# Copy to .leak-patterns.txt (gitignored) and list one case-insensitive regex per line:
+# real customer, tenant, ADO organisation or person names that must never appear in this repo.
+# tests/test_reusability_guards.py fails if any tracked file matches one of them.
+<customer-name>
+<ado-org-name>

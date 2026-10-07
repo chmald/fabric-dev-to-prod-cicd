@@ -1,0 +1,75 @@
+# =============================================================================
+# Path 3 (Microsoft Learn CI/CD Option 2) — ADO YAML wrapping the Python
+# `fabric-cicd` library (scripts/deploy_fabric_cicd.py).
+#
+# OPTIONAL ALTERNATIVE — not the shipped path. The shipped path is
+# ../deploy-workspace-per-branch.yml (Path 2). Status: static-only.
+#
+# Mirrors the Microsoft tutorial:
+#   https://learn.microsoft.com/en-us/fabric/cicd/tutorial-fabric-cicd-azure-devops
+#   * Only the Dev workspace is Git-connected (branch `dev`).
+#   * `test` and `prod` branches are deployment records; a merge into them runs
+#     this pipeline, which publishes fabric/ to the matching workspace.
+#   * fabric/parameter.yml swaps environment-specific IDs per --target_env.
+#
+# Setup (tutorial §4):
+#   1. Key Vault secrets aztenantid, azclientid, azspnsecret.
+#   2. ADO variable group `fabric_cicd_group_sensitive` linked to that Key Vault.
+#   3. ADO variable group `fabric_cicd_group_non_sensitive` with
+#      FABRIC_WORKSPACE_PREFIX (e.g. Contoso-Sales -> Contoso-Sales-Test / -Prod).
+#   4. ADO environments `fabric-test` and `fabric-prod` with approval checks.
+#   5. SP is Contributor (or higher) on the Test and Prod workspaces; tenant
+#      setting "Service principals can call Fabric public APIs" enabled.
+# =============================================================================
+
+name: 'fabric-cicd-py-$(Date:yyyyMMdd)$(Rev:.r)'
+
+# Registered manually; no CI trigger so it can't race the shipped pipeline on `prod`.
+# To adopt this path: trigger: { branches: { include: [ test, prod ] }, paths: { include: [ fabric/* ] } }
+trigger: none
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: itemsInScope
+    type: object
+    default: [VariableLibrary, Lakehouse, Warehouse, SemanticModel]
+
+variables:
+  - group: fabric_cicd_group_sensitive
+  - group: fabric_cicd_group_non_sensitive
+  - name: pythonVersion
+    value: '3.12'
+
+stages:
+- ${{ each env in split('test,prod', ',') }}:
+  - stage: Deploy_${{ env }}
+    displayName: 'fabric-cicd -> ${{ env }} workspace'
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/${{ env }}')
+    dependsOn: []
+    jobs:
+    - deployment: deploy_${{ env }}
+      environment: 'fabric-${{ env }}'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - checkout: self
+            - task: UsePythonVersion@0
+              inputs:
+                versionSpec: '$(pythonVersion)'
+            - script: pip install --quiet -r scripts/requirements-fabric-cicd.txt
+              displayName: 'Install fabric-cicd'
+            - script: |
+                python scripts/deploy_fabric_cicd.py \
+                  --target_env ${{ env }} \
+                  --items_in_scope '${{ convertToJson(parameters.itemsInScope) }}' \
+                  --mode library
+              displayName: 'Publish to ${{ env }}'
+              env:
+                FABRIC_WORKSPACE_PREFIX: $(FABRIC_WORKSPACE_PREFIX)
+                AZURE_TENANT_ID: $(aztenantid)
+                AZURE_CLIENT_ID: $(azclientid)
+                AZURE_CLIENT_SECRET: $(azspnsecret)

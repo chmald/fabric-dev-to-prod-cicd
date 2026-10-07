@@ -24,11 +24,14 @@
 #            * Contoso-Sales-Model SemanticModel → expressions.tmdl M parameter values
 #        Idempotent — skipped per-item if the decoded definition already matches.
 #        Solves the Direct Lake parameter-swap limitation (DP rules are
-#        greyed out for Direct Lake on OneLake models). See docs/01.
+#        greyed out for Direct Lake on OneLake models). See docs/06.
 #
 # Active value-set selection in the Variable Library is a one-time per-workspace
-# manual step in the Fabric portal (no public REST endpoint today). See
-# docs/06-dynamic-env-injection.md for setup.
+# setting (Fabric portal, or REST PATCH .../variableLibraries/{id} with
+# properties.activeValueSetName). See docs/10-dynamic-env-injection.md.
+#
+# Alternatives (optional, static-only, no CI trigger): alternatives/ holds the
+# Path 1 (deployment pipelines) and Path 3 (fabric-cicd) YAML. See docs/07.
 # =============================================================================
 
 name: 'fabric-cicd-$(Date:yyyyMMdd)$(Rev:.r)'
@@ -61,7 +64,7 @@ variables:
   - name: pythonVersion
     value: '3.11'
   - name: serviceConnection
-    value: 'fabric-cicd-sp'
+    value: 'fabric-cicd-sp'   # your ADO service connection name (compile-time; can't come from a variable group)
 
 stages:
 # -----------------------------------------------------------------------------
@@ -130,7 +133,7 @@ stages:
           # connectionId is a no-op on Fabric's side, so it's safe on every run.
           # Gated on `GIT_CONNECTION_ID` so environments that haven't published
           # a connection yet just skip the bind. See
-          # docs/07-service-principal-fabric-git-setup.md for one-time setup.
+          # docs/11-service-principal-fabric-git-setup.md for one-time setup.
           - task: AzureCLI@2
             displayName: 'Ensure myGitCredentials bound to Fabric ADO connection'
             condition: and(succeeded(), ne(variables['GIT_CONNECTION_ID'], ''))

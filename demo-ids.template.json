@@ -1,13 +1,34 @@
 {
+  "_template": true,
+  "_note": "Template only. Copy to demo-ids.local.json (gitignored) and fill in your values for human reference and local dry runs of scripts/inject_env_values.py. Pipelines never read this file: at run time per-environment values come from the ADO variable groups contoso-fabric-env-dev / contoso-fabric-env-prod. Never put secrets here.",
+
+  "workload": {
+    "_note": "The ONLY domain-specific surface. To retarget the pattern, change these values, rename the matching item folders + .platform displayNames under fabric/, and set VARIABLE_LIBRARY_NAME / SEMANTIC_MODEL_NAME in the variable groups. See docs/01-architecture.md#adapting-this-pattern-to-another-workload.",
+    "workspacePrefix": "Contoso-Sales",
+    "environments": ["dev", "prod"],
+    "variableGroupPrefix": "contoso-fabric-env-",
+    "adoEnvironmentPrefix": "fabric-",
+    "serviceConnection": "fabric-cicd-sp",
+    "items": {
+      "lakehouse": "Contoso_Sales_LH",
+      "warehouse": "Contoso-Sales-WH",
+      "semanticModel": "Contoso-Sales-Model",
+      "variableLibrary": "Contoso_Vars"
+    }
+  },
+
   "tenantId": "00000000-0000-0000-0000-000000000000",
   "subscriptionId": "00000000-0000-0000-0000-000000000000",
   "adoOrg": "<your-ado-org>",
   "adoProject": "fabric-cicd-ado-integration",
   "adoRepo": "fabric-cicd-ado-integration",
   "adoRemote": "https://dev.azure.com/<your-ado-org>/fabric-cicd-ado-integration/_git/fabric-cicd-ado-integration",
+  "servicePrincipalAppId": "00000000-0000-0000-0000-000000000000",
+  "fabricGitConnectionId": "00000000-0000-0000-0000-000000000000",
   "capacityId": "00000000-0000-0000-0000-000000000000",
   "capacityName": "<your-capacity-name>",
   "capacitySku": "F2",
+
   "workspaces": {
     "dev": {
       "name": "Contoso-Sales-Dev",
@@ -26,5 +47,16 @@
       "warehouseSqlEndpoint": "<prod-warehouse-sql>.datawarehouse.fabric.microsoft.com"
     }
   },
-  "_note": "Template snapshot. Copy to demo-ids.json (gitignored) and fill in your real values. The pipeline does NOT read this file at runtime — per-env values are supplied by ADO variable groups contoso-fabric-env-dev / contoso-fabric-env-prod. This file is for human reference + local dry-runs of scripts/inject_env_values.py."
+
+  "optionalPaths": {
+    "_note": "Only if you adopt an alternative path (docs/07-cicd-paths-and-promotion.md).",
+    "path1DeploymentPipeline": {
+      "deploymentPipelineId": "00000000-0000-0000-0000-000000000000",
+      "sourceStageId": "00000000-0000-0000-0000-000000000000",
+      "targetStageId": "00000000-0000-0000-0000-000000000000"
+    },
+    "path3FabricCicd": {
+      "testWorkspaceName": "Contoso-Sales-Test"
+    }
+  }
 }

@@ -17,11 +17,11 @@
 /// works end-to-end even if someone runs `updateFromGit` outside the pipeline.
 ///
 /// To CHANGE the per-environment values, edit the ADO variable group — not
-/// this file. See docs/06-dynamic-env-injection.md.
+/// this file. See docs/10-dynamic-env-injection.md.
 ///
 /// Pattern: M parameters for Direct Lake on OneLake — the pipeline
 /// rewrites these values per workspace so promotion doesn't require
-/// manual parameter changes. See docs/01-direct-lake-variables.md.
+/// manual parameter changes. See docs/06-direct-lake-variables.md.
 /// =============================================================================
 expression WorkspaceId = "11111111-1111-1111-1111-111111111111" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 

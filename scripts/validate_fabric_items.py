@@ -135,15 +135,22 @@ def validate_semantic_models(errors: list[str]) -> list[Path]:
     return models
 
 
+# M parameters scripts/inject_env_values.py rewrites; each must exist exactly once.
+INJECTED_M_PARAMS = ("WorkspaceId", "LakehouseId", "WarehouseId")
+
+
 def validate_m_param_definitions(errors: list[str]) -> None:
-    """Confirm WorkspaceId + LakehouseId M parameters exist in expressions.tmdl
-    so the post-sync injection step has something to overwrite. Doesn't check
-    the values themselves — those get rewritten by scripts/inject_env_values.py."""
-    expr_file = FABRIC / "Contoso-Sales-Model.SemanticModel" / "definition" / "expressions.tmdl"
+    """Confirm the M parameters the post-sync injection step overwrites exist in
+    expressions.tmdl exactly once. Doesn't check the values themselves — those
+    get rewritten by scripts/inject_env_values.py. The model folder comes from
+    SEMANTIC_MODEL_NAME (same variable the injector reads)."""
+    model_name = os.environ.get("SEMANTIC_MODEL_NAME", "Contoso-Sales-Model")
+    expr_file = FABRIC / f"{model_name}.SemanticModel" / "definition" / "expressions.tmdl"
     if not expr_file.exists():
+        _err(errors, expr_file, f"expected expressions.tmdl for SEMANTIC_MODEL_NAME='{model_name}'")
         return
     text = expr_file.read_text(encoding="utf-8")
-    for name in ("WorkspaceId", "LakehouseId"):
+    for name in INJECTED_M_PARAMS:
         pattern = re.compile(rf'(?m)^\s*expression\s+{name}\s*=\s*"[^"]*"')
         n = len(pattern.findall(text))
         if n == 0:
@@ -153,6 +160,9 @@ def validate_m_param_definitions(errors: list[str]) -> None:
 
 
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):  # Windows consoles default to cp1252 (no ✓ / ✗)
+            stream.reconfigure(encoding="utf-8", errors="replace")
     if not FABRIC.exists():
         print(f"✗ fabric/ directory not found at {FABRIC}", file=sys.stderr)
         return 1

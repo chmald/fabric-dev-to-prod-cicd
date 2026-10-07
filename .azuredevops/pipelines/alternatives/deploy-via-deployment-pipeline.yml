@@ -1,0 +1,104 @@
+# =============================================================================
+# Path 1 (Microsoft Learn CI/CD Option 3) — ADO YAML that promotes items through
+# a Fabric DEPLOYMENT PIPELINE (Dev stage -> Prod stage).
+#
+# OPTIONAL ALTERNATIVE — not the shipped path. The shipped path is
+# ../deploy-workspace-per-branch.yml (Path 2). Status: static-only (YAML not run
+# live from this repo); the deployment-pipeline deploy itself was exercised
+# manually during the originating build.
+#
+# When to choose it: the team already promotes with Fabric deployment pipelines,
+# wants one `main` branch, and can live with the caveats below.
+#
+# Caveats (see docs/07-cicd-paths-and-promotion.md):
+#   * A service principal can deploy only when EVERY item in the request supports
+#     service principals. Warehouse promotion returned PrincipalTypeNotSupported in
+#     the originating build, so this YAML deploys Lakehouse + VariableLibrary only.
+#   * Deployment rules are unavailable for Direct Lake on OneLake semantic models,
+#     so the model would keep pointing at Dev. Use Path 2's Stage 3 (or Path 3's
+#     parameter.yml) for the model.
+#
+# Setup: create a deployment pipeline in Fabric, assign Contoso-Sales-Dev and
+# Contoso-Sales-Prod to its stages, make the SP an Admin of the deployment
+# pipeline + Contributor (or higher) on both workspaces, then create the ADO
+# variable group `contoso-fabric-dp` with:
+#   DEPLOYMENT_PIPELINE_ID, SOURCE_STAGE_ID, TARGET_STAGE_ID,
+#   DP_LAKEHOUSE_ID, DP_VARIABLE_LIBRARY_ID   (source-stage item IDs)
+# =============================================================================
+
+name: 'fabric-dp-$(Date:yyyyMMdd)$(Rev:.r)'
+
+# Registered manually; no CI trigger so it can't race the shipped pipeline.
+# To adopt this path: trigger: { branches: { include: [ main ] }, paths: { include: [ fabric/* ] } }
+trigger: none
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: contoso-fabric-dp
+  - name: pythonVersion
+    value: '3.11'
+  - name: serviceConnection
+    value: 'fabric-cicd-sp'   # your ADO service connection name
+
+stages:
+- stage: Validate
+  displayName: 'Validate Fabric items'
+  jobs:
+  - job: validate
+    steps:
+    - checkout: self
+      fetchDepth: 1
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '$(pythonVersion)'
+    - script: python scripts/validate_fabric_items.py
+      displayName: 'Validate Fabric items'
+
+- stage: DeployToProd
+  displayName: 'Deployment pipeline: Dev stage -> Prod stage'
+  dependsOn: Validate
+  jobs:
+  - deployment: deploy_prod
+    environment: 'fabric-prod'   # add an approval check on this ADO environment
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            displayName: 'POST deploymentPipelines/{id}/deploy + poll'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: pscore
+              scriptLocation: inlineScript
+              inlineScript: |
+                $token   = az account get-access-token --resource https://api.fabric.microsoft.com --query accessToken -o tsv
+                $headers = @{ Authorization = "Bearer $token"; 'Content-Type' = 'application/json' }
+
+                # SP-supported subset only (see header). Warehouse + semantic model go via Path 2 or Path 3.
+                $body = @{
+                    sourceStageId = "$(SOURCE_STAGE_ID)"
+                    targetStageId = "$(TARGET_STAGE_ID)"
+                    note          = "ADO deploy of $(Build.SourceVersion)"
+                    items         = @(
+                        @{ sourceItemId = "$(DP_LAKEHOUSE_ID)";        itemType = 'Lakehouse' }
+                        @{ sourceItemId = "$(DP_VARIABLE_LIBRARY_ID)"; itemType = 'VariableLibrary' }
+                    )
+                } | ConvertTo-Json -Depth 5
+
+                $resp = Invoke-WebRequest -Method POST -UseBasicParsing -Headers $headers -Body $body `
+                    -Uri "https://api.fabric.microsoft.com/v1/deploymentPipelines/$(DEPLOYMENT_PIPELINE_ID)/deploy"
+                $opId = $resp.Headers['x-ms-operation-id']
+                Write-Host "Operation: $opId"
+                do {
+                    Start-Sleep -Seconds 10
+                    $op = Invoke-RestMethod -Headers $headers -Uri "https://api.fabric.microsoft.com/v1/operations/$opId"
+                    Write-Host "  status=$($op.status)"
+                } while ($op.status -in @('NotStarted', 'Running'))
+                if ($op.status -ne 'Succeeded') {
+                    Write-Error "Deployment failed: $($op | ConvertTo-Json -Depth 6)"
+                    exit 1
+                }
+                Write-Host "Deployed Lakehouse + VariableLibrary to the Prod stage."

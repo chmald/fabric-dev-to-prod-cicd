@@ -1,11 +1,33 @@
+# Python
 __pycache__/
 *.pyc
 .venv/
-.env
+.pytest_cache/
+
+# Editors / local state
 .vscode/
 .fabric_local/
+tmp/
 
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+secrets.json
 .sp-secret.json
 
-# Per-tenant snapshot of real workspace + Fabric item IDs. Use demo-ids.template.json as a starting point.
+# Populated per-tenant IDs. Commit demo-ids.template.json only.
 demo-ids.json
+demo-ids.local.json
+*.local.json
+
+# Local leak-detection patterns (real customer / tenant names). See .leak-patterns.example.txt.
+.leak-patterns.txt
+
+# azd state (not used by this pattern, ignored defensively)
+.azure/
+
+# draw.io autosave / backup files
+*.drawio.bkp
+.$*.drawio.bkp

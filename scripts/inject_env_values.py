@@ -413,6 +413,9 @@ def verify_semantic_model_params(
 # ---------------------------------------------------------------------------
 
 def main() -> int:
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):  # Windows consoles default to cp1252 (no ✓)
+            stream.reconfigure(encoding="utf-8", errors="replace")
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)-7s %(message)s",

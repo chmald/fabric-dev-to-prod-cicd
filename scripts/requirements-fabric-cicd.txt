@@ -1,0 +1,5 @@
+# Path 3 only (scripts/deploy_fabric_cicd.py). The shipped pipeline needs only requirements.txt.
+# fabric-cicd moves fast: pin it, and re-run the Path 3 checks in docs/04-testing.md after each bump.
+fabric-cicd==1.4.0
+azure-identity>=1.19.0,<2
+requests>=2.32.0
