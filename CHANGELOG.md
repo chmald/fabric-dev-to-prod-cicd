@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased - 2026-10-08
+
+- Added an MIT `LICENSE` and a testing-only disclaimer (README top warning plus Disclaimer and License sections).
+
 ## 2.0.0 - 2026-10-07
 
 Retrofit to the current demo-pattern standard (docs/-first layout, draw.io diagrams with official icons, visual-richness lint) and fold-in of the reusable workshop material from the originating engagement.

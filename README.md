@@ -23,6 +23,10 @@
 A reusable demo pattern for promoting **Microsoft Fabric** items (Lakehouse, Warehouse, a Direct Lake on OneLake semantic model and a variable library) between Dev and Prod workspaces with **Azure DevOps**. Each workspace is bound to its own Git branch, one ADO YAML pipeline validates, syncs and injects per-environment values, and a `git merge dev -> prod` is the whole promotion. It is for data platform engineers, Solution Engineers and architects who need to show, then adapt, a Fabric CI/CD setup that works under a service principal and solves the Direct Lake "rules are greyed out" problem. The example workload is a generic **Contoso Sales** model; retargeting it is a configuration change.
 
 > Formerly published as `fabric-cicd-ado-integration`. Old links redirect automatically. Renumbered doc pages are mapped in [Moved documents](#moved-documents).
+
+> [!WARNING]
+> **For testing and demonstration purposes only.** This is a personal reference demo provided "as is" under the [MIT License](LICENSE), without warranty or support. It is not an official Microsoft product or sample, has not been through a production security review, and is not intended for production use. Review, test, and harden it before reusing any part of it, deploy only to non-production subscriptions, and never use real customer or personal data.
+
 ## At a glance
 
 | | Item | Value |
@@ -196,6 +200,16 @@ This repo is meant to be imported into an Azure DevOps project (or forked) and p
 | <img src="./docs/assets/icons/commit.svg" width="20" alt=""/> | v2.0.0 retrofit (2026-10-07) | Visual standard, renumbered docs, alternatives folded in, Learn accuracy pass. See [CHANGELOG.md](./CHANGELOG.md). |
 | <img src="./docs/assets/icons/policy.svg" width="20" alt=""/> | Locked decisions | Branch per workspace; values in variable groups; SP via workload identity federation; Stage 3 owns Direct Lake parameters. Rationale in [01](./docs/01-architecture.md). |
 
+## Disclaimer
+
+> [!CAUTION]
+> This project is provided for testing, learning, and demonstration purposes only. It is not an official Microsoft product, sample, or service, and it is not supported under any Microsoft support program. Azure services, APIs, and pricing referenced here change over time — validate against current Microsoft Learn documentation before relying on any detail. Deploying it creates billable Azure resources; you are responsible for their cost, security, and cleanup.
+
+## License
+
+> [!NOTE]
+> Released under the [MIT License](LICENSE).
+
 ---
 
-*Last updated: 2026-10-07*
+*Last updated: 2026-10-08*
