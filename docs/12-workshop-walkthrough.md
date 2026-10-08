@@ -13,7 +13,7 @@
 
 ![Default](./assets/badges/default.svg) ![Path 2 live-tested](./assets/badges/path2-live.svg) ![Static only](./assets/badges/static-only.svg)
 
-A ready-to-run, 60-minute customer workshop on Fabric CI/CD with Azure DevOps, for one presenter. It answers three questions most data teams bring: how to deploy a Direct Lake model whose source differs per environment, which of the three CI/CD paths fits them, and how to get from "ADO is connected but unused" to a working pipeline. The live segment uses Path 2; Paths 1 and 3 are walked through in code. This page is the presenter's script - the forwardable decision content is in [07](./07-cicd-paths-and-promotion.md) and [08](./08-ado-bridge-guidance.md).
+A ready-to-run, 60-minute workshop on Fabric CI/CD with Azure DevOps, for one presenter and a data-team audience. It answers three questions most data teams bring: how to deploy a Direct Lake model whose source differs per environment, which of the three CI/CD paths fits them, and how to get from "ADO is connected but unused" to a working pipeline. The live segment uses Path 2; Paths 1 and 3 are walked through in code. This page is the presenter's script - the forwardable decision content is in [07](./07-cicd-paths-and-promotion.md) and [08](./08-ado-bridge-guidance.md).
 
 ## At a glance
 
@@ -36,7 +36,7 @@ A ready-to-run, 60-minute customer workshop on Fabric CI/CD with Azure DevOps, f
 
 | Step | | Do | Expected result | Proof on screen |
 |---|---|---|---|---|
-| **1** | <img src="./assets/icons/users.svg" width="28" alt=""/> | Restate their context and the three asks; agree the outcome | Shared problem statement | Agenda slide |
+| **1** | <img src="./assets/icons/users.svg" width="28" alt=""/> | Restate the audience's context and the three asks; agree the outcome | Shared problem statement | Agenda slide |
 | **2** | <img src="./assets/icons/variable-library.svg" width="28" alt=""/> | Open `Contoso_Vars` in Dev; show variables and value sets; open the model's `expressions.tmdl` | They see why rules and `{{var}}` can't fix Direct Lake | Diagram in [06](./06-direct-lake-variables.md#how-it-works-in-this-repo) |
 | **3** | <img src="./assets/icons/code.svg" width="28" alt=""/> | In VS Code on `dev`, add a measure to `table1.tmdl`; commit + push | Pipeline queues | ADO Pipelines tab |
 | **4** | <img src="./assets/icons/azure-devops.svg" width="28" alt=""/> | Walk Stage 1 -> 2 -> 3 logs as they run | Three green stages | `synchronized to commit`, `verification passed` |
@@ -48,7 +48,7 @@ A ready-to-run, 60-minute customer workshop on Fabric CI/CD with Azure DevOps, f
 | **10** | <img src="./assets/icons/commit.svg" width="28" alt=""/> | Show the 6-step migration path; assign owners and dates | Named follow-ups | [08 handout](./08-ado-bridge-guidance.md#recommended-next-steps-handout) |
 
 > [!TIP]
-> Frame the matrix with Microsoft's own words - *"many organizations take a hybrid approach"* - and the field observation that most of the work happens in Azure DevOps whichever path you pick. Teams relax once they see the paths combine.
+> Frame the matrix with Microsoft's own words - *"many organizations take a hybrid approach"* - and the practical observation that most of the work happens in Azure DevOps whichever path you pick. Teams relax once they see the paths combine.
 
 > [!CAUTION]
 > **Don't show** real tenant, workspace or connection IDs on screen (the logs redact them; your browser address bar doesn't), and don't run Path 1 or Path 3 live from this repo - they're static-only here. Don't promise that deployment rules will handle Direct Lake on OneLake models.
@@ -86,7 +86,7 @@ A ready-to-run, 60-minute customer workshop on Fabric CI/CD with Azure DevOps, f
 | <img src="./assets/icons/users.svg" width="24" alt=""/> | Named follow-ups with owners and dates |
 
 > [!NOTE]
-> The live segment has been run on Path 2 in the originating engagement (2026-05). Re-run the pre-flight in your own tenant before quoting it as live-tested there.
+> The live segment was run end to end on Path 2 in the original build (2026-05). Re-run the pre-flight in your own tenant before describing it as live-tested there.
 
 ---
 

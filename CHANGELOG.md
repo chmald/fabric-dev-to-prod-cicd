@@ -3,10 +3,11 @@
 ## Unreleased - 2026-10-08
 
 - Added an MIT `LICENSE` and a testing-only disclaimer (README top warning plus Disclaimer and License sections).
+- Docs: rewrote for external audiences; removed internal terminology. README, docs, the workshop walkthrough, test docstrings, `scripts/lint_doc_visuals.py` and the troubleshooting diagram no longer reference private authoring tooling or numbered internal rules, and no longer use sales-role or consulting framing. The *field-observed* label is now *observed in practice* (new badge `observed-in-practice.svg` replaces `field-observed.svg`; `troubleshooting-decision-tree` PNGs re-exported). `tests/test_reusability_guards.py` gains `test_no_internal_terminology`.
 
 ## 2.0.0 - 2026-10-07
 
-Retrofit to the current demo-pattern standard (docs/-first layout, draw.io diagrams with official icons, visual-richness lint) and fold-in of the reusable workshop material from the originating engagement.
+Retrofit to the repo's current documentation standard (docs/-first layout, draw.io diagrams with official icons, visual-richness lint) and fold-in of the reusable workshop material from the original build.
 
 ### Docs restructure
 
@@ -15,12 +16,12 @@ Retrofit to the current demo-pattern standard (docs/-first layout, draw.io diagr
 - 15 draw.io diagrams with official Microsoft Fabric and Azure (V24) icons, exported to PNG at 2x: architecture, service catalog, prerequisites map, pipeline deployment flow, manual deployment steps, testing matrix, troubleshooting tree, Direct Lake parameter injection, CI/CD paths comparison, ADO bridge path, semantic model change flow, Stage 3 sequence, SP onboarding, workshop story, configuration flow.
 - Hand-drawn ASCII flow charts replaced by diagrams (00 keeps a short terminal-friendly sketch).
 
-### Folded in from the originating engagement (generalized)
+### Folded in from the original workshop build (generalized)
 
 - Three-path framing (deployment pipelines / Git branch-per-workspace / `fabric-cicd`) mapped to Microsoft Learn Options 3 / 1 / 2, with a decision matrix and recommended combinations ([07](./docs/07-cicd-paths-and-promotion.md)).
 - Path 1 and Path 3 pipelines under `.azuredevops/pipelines/alternatives/` (no CI trigger, static-only), `scripts/deploy_fabric_cicd.py`, `scripts/requirements-fabric-cicd.txt`, and `fabric/parameter.yml`.
 - 60-minute run of show, pre-flight, recovery plan and audience take-aways ([12](./docs/12-workshop-walkthrough.md)); 6-step migration path and handout ([08](./docs/08-ado-bridge-guidance.md)).
-- Field-observed `DiscoverDependenciesFailed` on Git sync of hand-authored variable-library value sets, with the workaround ([05](./docs/05-troubleshooting.md)).
+- Observed-in-practice `DiscoverDependenciesFailed` on Git sync of hand-authored variable-library value sets, with the workaround ([05](./docs/05-troubleshooting.md)).
 
 ### Code
 
@@ -47,7 +48,7 @@ Retrofit to the current demo-pattern standard (docs/-first layout, draw.io diagr
 | `fabric-cicd` | `>=0.1.16` | pinned `1.4.0`; `parameter.yml` must sit at the root of `repository_directory` | [fabric-cicd parameterization](https://microsoft.github.io/fabric-cicd/latest/how_to/parameterization/) |
 | Model text in doc 06 | source built from `LakehouseId` | source built from `WorkspaceId` + `WarehouseId` (matches the committed TMDL) | repo |
 
-Not verifiable on Learn: `DiscoverDependenciesFailed` (marked field-observed), and the "rules greyed out for Direct Lake on OneLake" behaviour (Learn doesn't carve it out; an open Fabric idea confirms it).
+Not verifiable on Learn: `DiscoverDependenciesFailed` (marked observed in practice), and the "rules greyed out for Direct Lake on OneLake" behaviour (Learn doesn't carve it out; an open Fabric idea confirms it).
 
 ### Not done
 

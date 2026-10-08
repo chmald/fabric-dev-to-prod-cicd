@@ -33,7 +33,7 @@ How to deploy the shipped path - Path 2, branch per workspace - with the Azure D
 <sub>Editable source: [`assets/pipeline-deployment-flow.drawio`](./assets/pipeline-deployment-flow.drawio) - regenerate with `python scripts/export_diagrams.py docs/assets`.</sub>
 
 > [!IMPORTANT]
-> **Why there is no `azd up`.** The demo-pattern standard requires an azd template for every demo that provisions **Azure** resources. This one provisions Fabric items (through Git integration) and Azure DevOps objects (through the ADO portal or CLI), neither of which azd/Bicep manages, so the rule doesn't apply. Once Phases 0-3 are done, `git push` is the one-command deploy.
+> **Why there is no `azd up`.** This repo's conventions call for an azd template whenever a demo provisions **Azure** resources. This one provisions Fabric items (through Git integration) and Azure DevOps objects (through the ADO portal or CLI), neither of which azd/Bicep manages, so that convention doesn't apply. Once Phases 0-3 are done, `git push` is the one-command deploy.
 
 | Stage | | What it does | Owner script / task |
 |---|---|---|---|

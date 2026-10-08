@@ -13,7 +13,7 @@
 
 ![Default](./assets/badges/default.svg) ![Optional](./assets/badges/optional.svg) ![Path 2 live-tested](./assets/badges/path2-live.svg)
 
-A common starting point: a Fabric Dev workspace is already connected to an Azure DevOps repo, but nothing else uses it - promotion is still manual clicks and per-environment values are fixed by hand after each move. This page is the incremental plan from there to the shipped pipeline, in six steps that each stand on their own, plus the anti-patterns to avoid on the way. It works as a customer-facing "next steps" handout after a workshop.
+A common starting point: a Fabric Dev workspace is already connected to an Azure DevOps repo, but nothing else uses it - promotion is still manual clicks and per-environment values are fixed by hand after each move. This page is the incremental plan from there to the shipped pipeline, in six steps that each stand on their own, plus the anti-patterns to avoid on the way. It works as a stand-alone "next steps" handout after a workshop.
 
 ## At a glance
 

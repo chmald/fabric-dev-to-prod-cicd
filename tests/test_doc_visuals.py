@@ -1,4 +1,4 @@
-"""Docs meet the visual-richness standard (demo-pattern-authoring hard-rule #19).
+"""Docs meet the visual-richness documentation standard (see scripts/lint_doc_visuals.py).
 
     python -m pytest tests/test_doc_visuals.py      # or: python tests/test_doc_visuals.py
 """

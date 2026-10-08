@@ -11,9 +11,9 @@
 <img src="./assets/icons/semantic-model.svg" width="40" alt="Semantic model"/>
 </p>
 
-![Field-observed](./assets/badges/field-observed.svg) ![Default](./assets/badges/default.svg)
+![Observed in practice](./assets/badges/observed-in-practice.svg) ![Default](./assets/badges/default.svg)
 
-What to do when a run fails or the workspace shows the wrong data. Start with the quick-triage table - it keys off the stage and the **exact** error string - then jump to the product section. Every fix links to the doc that owns the setup. Errors marked *field-observed* come from the originating build and aren't documented on Microsoft Learn.
+What to do when a run fails or the workspace shows the wrong data. Start with the quick-triage table - it keys off the stage and the **exact** error string - then jump to the product section. Every fix links to the doc that owns the setup. Errors marked *observed in practice* come from the originating build and aren't documented on Microsoft Learn.
 
 ## Quick triage
 
@@ -32,7 +32,7 @@ What to do when a run fails or the workspace shows the wrong data. Start with th
 | `Ambiguous match: N SemanticModel items ...` | <img src="./assets/icons/semantic-model.svg" width="20" alt=""/> Stage 3 | Duplicate items in the workspace | Delete or rename the duplicates |
 | `Post-update verification failed` | <img src="./assets/icons/semantic-model.svg" width="20" alt=""/> Stage 3 | Write accepted, value not observable | Re-run; then fix in the portal and raise a support ticket |
 | Green run, Prod report shows Dev data | <img src="./assets/icons/variable-library.svg" width="20" alt=""/> Workspace | Active value set still `Dev` | Set it to `Prod` (portal or REST) |
-| `DiscoverDependenciesFailed` on Git sync | <img src="./assets/icons/variable-library.svg" width="20" alt=""/> Git integration | Hand-authored value-set JSON (field-observed) | See below |
+| `DiscoverDependenciesFailed` on Git sync | <img src="./assets/icons/variable-library.svg" width="20" alt=""/> Git integration | Hand-authored value-set JSON (observed in practice) | See below |
 | Pipeline queued forever / "No hosted parallelism" | <img src="./assets/icons/azure-devops.svg" width="20" alt=""/> ADO org | New org without the free grant | Request it, or use a self-hosted agent |
 
 ## Decision tree
@@ -85,7 +85,7 @@ A variable you added to the group but not to the injector's `overrides` map is s
 ## <img src="./assets/icons/variable-library.svg" width="24" alt=""/> Variable library: DiscoverDependenciesFailed
 
 > [!WARNING]
-> **Field-observed, not documented on Microsoft Learn.** In the originating build, committing a variable library whose `valueSets/*.json` (per-environment overrides) had been **hand-authored** in Git made the Git sync fail with `DiscoverDependenciesFailed`. Reverting to a flat `variables.json`, creating the value sets in the Fabric portal, and letting Fabric commit them back to Git avoided the error. The value-set files in this repo were produced that way. If you add value sets, author them in the portal first and commit from the workspace; only then edit values in Git.
+> **Observed in practice, not documented on Microsoft Learn.** In the originating build, committing a variable library whose `valueSets/*.json` (per-environment overrides) had been **hand-authored** in Git made the Git sync fail with `DiscoverDependenciesFailed`. Reverting to a flat `variables.json`, creating the value sets in the Fabric portal, and letting Fabric commit them back to Git avoided the error. The value-set files in this repo were produced that way. If you add value sets, author them in the portal first and commit from the workspace; only then edit values in Git.
 
 Microsoft's documented variable library failures (invalid names, wrong types, size over 1 MB, a missing active value set in a deployment target) are in [Variable library troubleshooting](https://learn.microsoft.com/en-us/fabric/cicd/variable-library/variable-library-troubleshoot).
 

@@ -1,4 +1,4 @@
-"""Configuration guard (demo-pattern-authoring hard-rule #18).
+"""Configuration guard.
 
 Fails when an environment variable read by scripts/*.py, a pipeline variable, or a
 workload key in demo-ids.template.json is missing from docs/13-configuration-reference.md.

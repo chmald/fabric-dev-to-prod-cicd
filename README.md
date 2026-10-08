@@ -20,7 +20,7 @@
   <img src="./docs/assets/badges/azd-na.svg" alt="azd: not applicable (no ARM resources)"/>
 </p>
 
-A reusable demo pattern for promoting **Microsoft Fabric** items (Lakehouse, Warehouse, a Direct Lake on OneLake semantic model and a variable library) between Dev and Prod workspaces with **Azure DevOps**. Each workspace is bound to its own Git branch, one ADO YAML pipeline validates, syncs and injects per-environment values, and a `git merge dev -> prod` is the whole promotion. It is for data platform engineers, Solution Engineers and architects who need to show, then adapt, a Fabric CI/CD setup that works under a service principal and solves the Direct Lake "rules are greyed out" problem. The example workload is a generic **Contoso Sales** model; retargeting it is a configuration change.
+A reusable demo pattern for promoting **Microsoft Fabric** items (Lakehouse, Warehouse, a Direct Lake on OneLake semantic model and a variable library) between Dev and Prod workspaces with **Azure DevOps**. Each workspace is bound to its own Git branch, one ADO YAML pipeline validates, syncs and injects per-environment values, and a `git merge dev -> prod` is the whole promotion. It is for data platform engineers and architects who need to demonstrate, then adapt, a Fabric CI/CD setup that works under a service principal and solves the Direct Lake "rules are greyed out" problem. The example workload is a generic **Contoso Sales** model; retargeting it is a configuration change.
 
 > Formerly published as `fabric-cicd-ado-integration`. Old links redirect automatically. Renumbered doc pages are mapped in [Moved documents](#moved-documents).
 
@@ -31,7 +31,7 @@ A reusable demo pattern for promoting **Microsoft Fabric** items (Lakehouse, War
 
 | | Item | Value |
 |---|---|---|
-| <img src="./docs/assets/icons/git-branch-sync.svg" width="24" alt=""/> | **Shipped path** | Path 2: ADO YAML + Fabric Git integration, one branch per workspace (Microsoft Learn Option 1). Live-tested in the originating engagement (2026-05). |
+| <img src="./docs/assets/icons/git-branch-sync.svg" width="24" alt=""/> | **Shipped path** | Path 2: ADO YAML + Fabric Git integration, one branch per workspace (Microsoft Learn Option 1). Live-tested end to end in the original build (2026-05). |
 | <img src="./docs/assets/icons/azure-devops.svg" width="24" alt=""/> | **Pipeline** | [`deploy-workspace-per-branch.yml`](./.azuredevops/pipelines/deploy-workspace-per-branch.yml): Validate -> SyncFabricFromBranch -> InjectEnvValues. |
 | <img src="./docs/assets/icons/keys.svg" width="24" alt=""/> | **Per-environment values** | ADO variable groups `contoso-fabric-env-dev` / `contoso-fabric-env-prod`, never Git. |
 | <img src="./docs/assets/icons/semantic-model.svg" width="24" alt=""/> | **Direct Lake answer** | Stage 3 rewrites the model's `WorkspaceId` / `LakehouseId` / `WarehouseId` M parameters per workspace through Fabric REST. |
@@ -196,7 +196,7 @@ This repo is meant to be imported into an Azure DevOps project (or forked) and p
 
 | | Record | Notes |
 |---|---|---|
-| <img src="./docs/assets/icons/file.svg" width="20" alt=""/> | Originating engagement | A customer Fabric DevOps + ADO CI/CD workshop (2026-05). Path 2 was built and run live there; customer-specific material stays in the owner's private notes, not in this repo. |
+| <img src="./docs/assets/icons/file.svg" width="20" alt=""/> | Original build | A Fabric DevOps + Azure DevOps CI/CD workshop (2026-05). Path 2 was built and run live there; everything specific to that environment was generalized, and no organization names or real IDs are in this repo. |
 | <img src="./docs/assets/icons/commit.svg" width="20" alt=""/> | v2.0.0 retrofit (2026-10-07) | Visual standard, renumbered docs, alternatives folded in, Learn accuracy pass. See [CHANGELOG.md](./CHANGELOG.md). |
 | <img src="./docs/assets/icons/policy.svg" width="20" alt=""/> | Locked decisions | Branch per workspace; values in variable groups; SP via workload identity federation; Stage 3 owns Direct Lake parameters. Rationale in [01](./docs/01-architecture.md). |
 

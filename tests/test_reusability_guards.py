@@ -1,4 +1,4 @@
-"""Reusability guards (demo-pattern-authoring hard-rule #14).
+"""Reusability guards (structural reusability + customer-facing wording).
 
 The workload block in demo-ids.template.json is the only domain-specific surface;
 these tests fail when code defaults, item folders, or Path 3 parameterization drift
@@ -16,6 +16,25 @@ WORKLOAD = json.loads((ROOT / "demo-ids.template.json").read_text(encoding="utf-
 ITEMS = WORKLOAD["items"]
 GUID = re.compile(r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b")
 TEXT_SUFFIXES = {".md", ".py", ".yml", ".yaml", ".json", ".txt", ".tmdl", ".sql", ".csv", ".gitignore", ""}
+BINARY_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".pbix", ".xlsx", ".docx"}
+# Generic internal jargon (not secrets) that has no meaning to an external reader.
+INTERNAL_TERMS = re.compile(
+    r"demo-pattern-authoring|azure-architecture-diagrams|daily[_ ]?driver|"
+    r"\b(MCAPS|MCEM|MSX|TPID|CSAM|ATU|STU|CSU|CAIP|MACC)\b|hard[- ]rules?\s*#|authoring gates?|"
+    r"hands-on-keyboard|\bHoK\b|technical close plan|solution play|azure consumed revenue|"
+    r"tech elevate|cloud accelerate factory|microsoft\.sharepoint\.com|viva engage|"
+    r"internal-only|microsoft-internal|not for customer distribution|solution engineers?",
+    re.IGNORECASE,
+)
+
+
+def all_tracked_files():
+    out = subprocess.run(["git", "ls-files", "--cached", "--others", "--exclude-standard"], cwd=ROOT,
+                         capture_output=True, text=True, check=True).stdout.split("\n")
+    for rel in filter(None, out):
+        p = ROOT / rel
+        if p.is_file():
+            yield rel, p
 
 
 def tracked_text_files():
@@ -98,6 +117,18 @@ def test_local_leak_patterns():
     leaks = [(rel, p) for rel, text in tracked_text_files() if rel != ".leak-patterns.txt"
              for p in pats if re.search(p, text, re.I)]
     assert not leaks, leaks
+
+
+def test_no_internal_terminology():
+    """Private authoring-tool names and internal sales/process jargon never ship in the public tree."""
+    hits = []
+    for rel, p in all_tracked_files():
+        if p.name == Path(__file__).name or p.suffix.lower() in BINARY_SUFFIXES:
+            continue
+        text = re.sub(r"data:image/[a-z+]+;?[A-Za-z0-9+/=,;]*", "", p.read_text(encoding="utf-8", errors="ignore"))
+        hits += [f"{rel}:{n}: {m.group(0)!r}" for n, line in enumerate(text.splitlines(), 1)
+                 for m in [INTERNAL_TERMS.search(line)] if m]
+    assert not hits, hits
 
 
 if __name__ == "__main__":

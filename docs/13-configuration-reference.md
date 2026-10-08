@@ -38,7 +38,7 @@ Every value you can set in this pattern, on one page - so nobody has to read the
 
 ## Workload block (demo-ids.template.json)
 
-The only domain-specific surface (hard rule: retargeting is configuration, not code). `tests/test_reusability_guards.py` keeps it in step with the items and code.
+The only domain-specific surface (design principle: retargeting is configuration, not code). `tests/test_reusability_guards.py` keeps it in step with the items and code.
 
 | Key | Default | Effect |
 |---|---|---|

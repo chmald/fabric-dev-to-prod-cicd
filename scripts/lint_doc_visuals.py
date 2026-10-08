@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint demo docs against the visual-richness standard (demo-pattern-authoring hard-rule #19).
+"""Lint demo docs against the visual-richness documentation standard used in this repo.
 
 Checks README.md and docs/*.md. Errors fail the run; warnings fail only with --strict.
 
@@ -20,7 +20,7 @@ Warnings
   status      a table mentions GA/Preview in text but carries no badge image
 
     python lint_doc_visuals.py                      # from the demo root
-    python lint_doc_visuals.py --root C:\\Users\\me\\Demos\\my-pattern --strict
+    python lint_doc_visuals.py --root path/to/my-pattern --strict
 """
 from __future__ import annotations
 

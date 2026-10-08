@@ -13,7 +13,7 @@
 
 ![MS Learn Option 1](./assets/badges/learn-option1.svg) ![MS Learn Option 2](./assets/badges/learn-option2.svg) ![MS Learn Option 3](./assets/badges/learn-option3.svg) ![Default](./assets/badges/default.svg) ![Opt-in](./assets/badges/opt-in.svg) ![fabric-cicd 1.4.0](./assets/badges/fabric-cicd.svg)
 
-There are three production-grade ways to promote Lakehouse, Warehouse and semantic-model objects between Fabric workspaces with Azure DevOps, and they map one-to-one to Microsoft Learn's [CI/CD workflow options in Fabric](https://learn.microsoft.com/en-us/fabric/cicd/manage-deployment). This repo ships **Path 2** live-tested and includes **Paths 1 and 3** as ready-to-adapt, static alternatives. This page compares them on the criteria that decide real projects and gives a recommendation per situation - it's the decision page to send a customer before a workshop.
+There are three production-grade ways to promote Lakehouse, Warehouse and semantic-model objects between Fabric workspaces with Azure DevOps, and they map one-to-one to Microsoft Learn's [CI/CD workflow options in Fabric](https://learn.microsoft.com/en-us/fabric/cicd/manage-deployment). This repo ships **Path 2** live-tested and includes **Paths 1 and 3** as ready-to-adapt, static alternatives. This page compares them on the criteria that decide real projects and gives a recommendation per situation - it's the decision page to share with your team before a workshop.
 
 ## At a glance
 
